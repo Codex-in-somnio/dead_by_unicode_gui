@@ -11,7 +11,7 @@
 #include <map>
 
 #define CONFIG_PATH "dbu_config.json"
-#define VERSION_NUMBER "0.1.2"
+#define VERSION_NUMBER "0.1.3"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -23,17 +23,19 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->setFixedSize(this->size());
 
-    QString langCode = "en";
-    if (QLocale::system().language() == QLocale::Japanese) langCode = "ja";
-    else if (QLocale::system().language() == QLocale::Chinese) langCode = "zh";
-    l10n->setCurLangCode(langCode);
-    inputWindow->setLocalizationContext(l10n);
+    QString langCode = QLocale::system().name().split("_").at(0).toLower();
 
     std::map<QString, QString> languages = l10n->getLanguages();
+    if (languages.count(langCode) == 0) langCode = "en";
+
     for (auto &lang : languages)
     {
         this->ui->displayLanguageComboBox->addItem(lang.second, QVariant::fromValue(lang.first));
+        if (lang.first == langCode) this->ui->displayLanguageComboBox->setCurrentText(lang.second);
     }
+
+    l10n->setCurLangCode(langCode);
+    inputWindow->setLocalizationContext(l10n);
 
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setIcon(QIcon(":/resources/dbu_icon.ico"));
@@ -47,11 +49,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     checkRegistry();
 
-    readConfig();
-    this->ui->keyLabel->setText(QKeySequence(hotKeyCode).toString());
-
     QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
 
+    readConfig();
+    this->ui->keyLabel->setText(QKeySequence(hotKeyCode).toString());
     setup();
     if (this->ui->showConfigCheckBox->isChecked()) this->show();
 }
@@ -137,6 +138,10 @@ void MainWindow::keyEventHandler(QKeyEvent *key)
 
 void MainWindow::setup()
 {
+    QString langCode = this->ui->displayLanguageComboBox->currentData().toString();
+    l10n->setCurLangCode(langCode);
+    loadUiText();
+
     UnregisterHotKey(HWND(winId()), 0);
 
     unsigned int modifier = 0;
@@ -155,10 +160,6 @@ void MainWindow::setup()
 
     inputWindow->setKeyDelay(this->ui->keyDelaySpinBox->value());
     inputWindow->setAutoEnter(this->ui->AutoEnterCheckBox->isChecked());
-
-    QString langCode = this->ui->displayLanguageComboBox->currentData().toString();
-    l10n->setCurLangCode(langCode);
-    loadUiText();
 }
 
 void MainWindow::readConfig()
