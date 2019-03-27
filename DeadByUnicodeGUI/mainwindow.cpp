@@ -7,31 +7,39 @@
 #include <QJsonDocument>
 #include <QMessageBox>
 #include <QDebug>
+#include <QLocale>
+#include <map>
 
 #define CONFIG_PATH "dbu_config.json"
-#define VERSION_NUMBER "0.1.1"
+#define VERSION_NUMBER "0.1.2"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    inputWindow(new InputWindow)
+    inputWindow(new InputWindow),
+    l10n(new Localization)
 {
     ui->setupUi(this);
 
     this->setFixedSize(this->size());
 
+    QString langCode = "en";
+    if (QLocale::system().language() == QLocale::Japanese) langCode = "ja";
+    else if (QLocale::system().language() == QLocale::Chinese) langCode = "zh";
+    l10n->setCurLangCode(langCode);
+    inputWindow->setLocalizationContext(l10n);
+
+    std::map<QString, QString> languages = l10n->getLanguages();
+    for (auto &lang : languages)
+    {
+        this->ui->displayLanguageComboBox->addItem(lang.second, QVariant::fromValue(lang.first));
+    }
+
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setIcon(QIcon(":/resources/dbu_icon.ico"));
     trayIcon->setToolTip("Dead By Unicode");
 
-    QMenu *menu = new QMenu(this);
-
-    menu->addAction(this->style()->standardIcon(QStyle::SP_FileIcon), "设置", this, SLOT(show()));
-    menu->addAction(this->style()->standardIcon(QStyle::SP_MessageBoxInformation), "关于", this, SLOT(showAbout()));
-    menu->addAction(this->style()->standardIcon(QStyle::SP_TitleBarCloseButton), "退出", this, SLOT(exit()));
-
-    trayIcon->setContextMenu(menu);
-    trayIcon->show();
+    menu = new QMenu(this);
 
     ker = new KeyEventReceiver();
     ker->setCancelEvent(true);
@@ -51,6 +59,34 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::loadUiText()
+{
+    menu->clear();
+
+    menu->addAction(this->style()->standardIcon(QStyle::SP_FileIcon), l10n->getTrans("settings"), this, SLOT(show()));
+    menu->addAction(this->style()->standardIcon(QStyle::SP_MessageBoxInformation), l10n->getTrans("about"), this, SLOT(showAbout()));
+    menu->addAction(this->style()->standardIcon(QStyle::SP_TitleBarCloseButton), l10n->getTrans("exit"), this, SLOT(exit()));
+
+    trayIcon->setContextMenu(menu);
+    trayIcon->show();
+
+    this->setWindowTitle(l10n->getTrans("settings"));
+    this->ui->hotkeySettingsGroupBox->setTitle(l10n->getTrans("set_hot_key"));
+    this->ui->keyInputButton->setText(l10n->getTrans("key_in"));
+    this->ui->keyDelayLabel->setText(l10n->getTrans("key_delay") + ":");
+    this->ui->keyDelayMsLabel->setText(l10n->getTrans("milliseconds"));
+    this->ui->AutoEnterCheckBox->setText(l10n->getTrans("auto_enter"));
+    this->ui->showConfigCheckBox->setText(l10n->getTrans("show_settings_on_start"));
+    this->ui->displayLanguageLabel->setText(l10n->getTrans("language") + ":");
+    this->ui->saveButton->setText(l10n->getTrans("save"));
+
+    QFont font(l10n->getTrans("ui_font"));
+    font.setPointSize(9);
+    QApplication::setFont(font);
+
+    inputWindow->loadUiText();
 }
 
 bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result)
@@ -82,11 +118,10 @@ void MainWindow::exit()
 void MainWindow::on_keyInputButton_pressed()
 {
     auto label = this->ui->keyLabel;
-    label->setText("请按键");
+    label->setText(l10n->getTrans("press_a_key"));
     label->selectAll();
     label->setFocus();
     label->installEventFilter(ker);
-
 }
 
 void MainWindow::keyEventHandler(QKeyEvent *key)
@@ -115,11 +150,15 @@ void MainWindow::setup()
 
     if(!RegisterHotKey(HWND(winId()), 0, modifier, hotKeyCode))
     {
-        QMessageBox::warning(this, "错误", "绑定快捷键失败，可能指定的按键组合已经被其他程序绑定。");
+        QMessageBox::warning(this, l10n->getTrans("error"), l10n->getTrans("register_hotkey_fail"));
     }
 
     inputWindow->setKeyDelay(this->ui->keyDelaySpinBox->value());
     inputWindow->setAutoEnter(this->ui->AutoEnterCheckBox->isChecked());
+
+    QString langCode = this->ui->displayLanguageComboBox->currentData().toString();
+    l10n->setCurLangCode(langCode);
+    loadUiText();
 }
 
 void MainWindow::readConfig()
@@ -138,7 +177,7 @@ void MainWindow::readConfig()
     QJsonDocument doc = QJsonDocument::fromJson(content);
     if (doc.isNull() || !doc.isObject())
     {
-        QMessageBox::warning(this, "错误", "读取配置文件时解析JSON失败。");
+        QMessageBox::warning(this, l10n->getTrans("error"), l10n->getTrans("parse_config_json_fail"));
         qDebug(content.toStdString().c_str());
         return;
     }
@@ -157,6 +196,14 @@ void MainWindow::readConfig()
     this->ui->AutoEnterCheckBox->setChecked(obj["auto_enter"].toBool());
     this->ui->showConfigCheckBox->setChecked(obj["show_config_on_start"].toBool());
 
+    QString langCode = obj["display_language"].toString();
+    auto languages = l10n->getLanguages();
+    if (languages.count(langCode) > 0)
+    {
+        QString curLangName = languages[langCode];
+        this->ui->displayLanguageComboBox->setCurrentText(curLangName);
+    }
+
     qDebug("Config read.");
 }
 
@@ -170,6 +217,7 @@ void MainWindow::writeConfig()
     obj.insert("key_delay", this->ui->keyDelaySpinBox->value());
     obj.insert("auto_enter", this->ui->AutoEnterCheckBox->isChecked());
     obj.insert("show_config_on_start", this->ui->showConfigCheckBox->isChecked());
+    obj.insert("display_language", this->ui->displayLanguageComboBox->currentData().toString());
 
     QJsonDocument doc(obj);
 
@@ -177,7 +225,7 @@ void MainWindow::writeConfig()
     file.setFileName(CONFIG_PATH);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
-        QMessageBox::warning(this, "错误", "写入配置文件失败。");
+        QMessageBox::warning(this, l10n->getTrans("error"), l10n->getTrans("write_config_fail"));
         return;
     }
     file.write(doc.toJson());
@@ -206,7 +254,7 @@ void MainWindow::checkRegistry()
     if (result != ERROR_SUCCESS)
     {
         QString errMessage = systemErrorToQString(result);
-        QMessageBox::warning(this, "错误", "无法判断是否已启用十六进制小键盘输入：打开“HKEY_CURRENT_USER\\Control Panel\\Input Method”失败。（" + errMessage + "）");
+        QMessageBox::warning(this, l10n->getTrans("error"), l10n->getTrans("open_hkey_fail").arg("HKEY_CURRENT_USER\\Control Panel\\Input Method") + " (" + errMessage + ")");
         return;
     }
 
@@ -224,21 +272,21 @@ void MainWindow::checkRegistry()
     else if (result != ERROR_SUCCESS && result != ERROR_FILE_NOT_FOUND && result != ERROR_MORE_DATA)
     {
         QString errMessage = systemErrorToQString(result);
-        QMessageBox::warning(this, "错误", "无法判断是否已启用十六进制小键盘输入:请求“EnableHexNumpad”失败。（" + errMessage + "）");
+        QMessageBox::warning(this, l10n->getTrans("error"), l10n->getTrans("query_reg_value_fail").arg("EnableHexNumpad") + " (" + errMessage + ")");
     }
     else
     {
-        if(QMessageBox::question(this, "提示", "检测到未启用十六进制小键盘输入，是否立即设置启用？") == QMessageBox::Yes)
+        if(QMessageBox::question(this, l10n->getTrans("question"), l10n->getTrans("question_enable_hex_numpad")) == QMessageBox::Yes)
         {
             DWORD regSetResult = RegSetValueExW(hKey, valueName, 0, REG_SZ, (const BYTE *) dataStr, dataStrSize);
             if (regSetResult == ERROR_SUCCESS)
             {
-                QMessageBox::information(this, "提示", "已写入注册表项。需要重新登录Windows账号使设置生效。");
+                QMessageBox::information(this, l10n->getTrans("info"), l10n->getTrans("set_reg_value_success"));
             }
             else
             {
                 QString errMessage = systemErrorToQString(regSetResult);
-                QMessageBox::warning(this, "错误", "写入注册表项失败。（" + errMessage + "）");
+                QMessageBox::warning(this, l10n->getTrans("error"), l10n->getTrans("set_reg_value_fail") + " (" + errMessage + ")");
             }
         }
     }
@@ -247,11 +295,11 @@ void MainWindow::checkRegistry()
 void MainWindow::showAbout()
 {
     QString aboutText =
-            "<b>Dead By Unicode</b><br>" \
-            "作者：K9YYY<br>" \
-            "Release 版本：" + QString::fromLatin1(VERSION_NUMBER) + "<br>" \
-            "编译时间：" + QString::fromLatin1(__DATE__) + ", " + QString::fromLatin1(__TIME__) + "<br>" \
-            "<a href=\"https://github.com/k9yyy/dead_by_unicode_gui\">GitHub项目页</a>";
+            "<b>Dead By Unicode</b><br>" +
+            l10n->getTrans("author") + ": K9YYY<br>" +
+            l10n->getTrans("release_version") + ": " + QString::fromLatin1(VERSION_NUMBER) + "<br>" +
+            l10n->getTrans("build_datetime") + ": " + QString::fromLatin1(__DATE__) + ", " + QString::fromLatin1(__TIME__) + "<br>" \
+            "<a href=\"" + l10n->getTrans("github_project_url") + "\">" + l10n->getTrans("github_project_page") + "</a>";
 
     QMessageBox::about(this, "关于", aboutText);
 }
@@ -260,5 +308,5 @@ void MainWindow::on_saveButton_pressed()
 {
     setup();
     writeConfig();
-    QMessageBox::information(this, "信息", "已保存设置。");
+    QMessageBox::information(this, l10n->getTrans("info"), l10n->getTrans("config_saved"));
 }

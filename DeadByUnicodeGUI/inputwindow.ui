@@ -10,12 +10,6 @@
     <height>163</height>
    </rect>
   </property>
-  <property name="font">
-   <font>
-    <family>微软雅黑</family>
-    <pointsize>9</pointsize>
-   </font>
-  </property>
   <property name="windowTitle">
    <string>输入文本</string>
   </property>
@@ -64,12 +58,6 @@ color: rgb(255, 255, 255);</string>
      <height>23</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <family>微软雅黑</family>
-     <pointsize>9</pointsize>
-    </font>
-   </property>
    <property name="text">
     <string>输入 (Enter)</string>
    </property>
@@ -91,12 +79,6 @@ color: rgb(255, 255, 255);</string>
      <width>121</width>
      <height>23</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>微软雅黑</family>
-     <pointsize>9</pointsize>
-    </font>
    </property>
    <property name="text">
     <string>取消 (Esc)</string>

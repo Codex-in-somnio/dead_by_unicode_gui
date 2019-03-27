@@ -15,13 +15,15 @@ SOURCES += main.cpp\
     inputwindow.cpp \
     mainwindow.cpp \
     hexinput.cpp \
-    keyeventreceiver.cpp
+    keyeventreceiver.cpp \
+    localization.cpp
 
 HEADERS  += \
     inputwindow.h \
     mainwindow.h \
     hexinput.h \
-    keyeventreceiver.h
+    keyeventreceiver.h \
+    localization.h
 
 FORMS    += \
     inputwindow.ui \

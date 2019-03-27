@@ -27,6 +27,12 @@ InputWindow::~InputWindow()
     delete ui;
 }
 
+void InputWindow::loadUiText()
+{
+    this->ui->enterButton->setText(l10n->getTrans("enter") + " (Enter)");
+    this->ui->hideButton->setText(l10n->getTrans("cancel") + " (Esc)");
+}
+
 void InputWindow::setFocusToTextArea()
 {
     ui->inputTextArea->setFocus();
@@ -66,4 +72,9 @@ void InputWindow::setKeyDelay(int delay)
 void InputWindow::setAutoEnter(bool flag)
 {
     autoEnter = flag;
+}
+
+void InputWindow::setLocalizationContext(Localization *l10n)
+{
+    this->l10n = l10n;
 }

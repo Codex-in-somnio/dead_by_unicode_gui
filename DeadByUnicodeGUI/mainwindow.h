@@ -7,6 +7,7 @@
 #include <QAction>
 #include "inputwindow.h"
 #include "keyeventreceiver.h"
+#include "localization.h"
 
 namespace Ui {
 class MainWindow;
@@ -30,10 +31,13 @@ private:
     QSystemTrayIcon *trayIcon;
     KeyEventReceiver *ker;
     int hotKeyCode = 0x44; // default to 'D'
+    Localization *l10n;
+    QMenu *menu;
     void setup();
     void readConfig();
     void writeConfig();
     void checkRegistry();
+    void loadUiText();
 
 private slots:
     void exit();
