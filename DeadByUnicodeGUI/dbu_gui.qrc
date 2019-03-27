@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>resources/dbu_icon.ico</file>
+        <file>resources/dbu_icon_16.png</file>
     </qresource>
 </RCC>

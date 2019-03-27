@@ -11,7 +11,7 @@
 #include <map>
 
 #define CONFIG_PATH "dbu_config.json"
-#define VERSION_NUMBER "0.1.3"
+#define VERSION_NUMBER "0.1.4"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
     inputWindow->setLocalizationContext(l10n);
 
     trayIcon = new QSystemTrayIcon(this);
-    trayIcon->setIcon(QIcon(":/resources/dbu_icon.ico"));
+    trayIcon->setIcon(QIcon(":/resources/dbu_icon_16.png"));
     trayIcon->setToolTip("Dead By Unicode");
 
     menu = new QMenu(this);

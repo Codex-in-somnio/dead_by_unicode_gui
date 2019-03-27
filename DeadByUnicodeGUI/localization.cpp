@@ -72,7 +72,7 @@ Localization::Localization()
     m["zh"]["build_datetime"] = "编译时间";
     m["zh"]["github_project_page"] = "GitHub项目页";
     m["zh"]["github_project_url"] = "https://github.com/k9yyy/dead_by_unicode_gui";
-	m["zh"]["ui_font"] = "微软雅黑";
+    m["zh"]["ui_font"] = "Microsoft YaHei UI";
 
     // ---------------------------------------------
 
@@ -94,7 +94,7 @@ Localization::Localization()
     m["ja"]["error"] = "エラー";
     m["ja"]["question"] = "プロンプト";
     m["ja"]["info"] = "インフォ";
-    m["ja"]["ui_font"] = "Meiryo";
+    m["ja"]["ui_font"] = "Meiryo UI";
 
 }
 
