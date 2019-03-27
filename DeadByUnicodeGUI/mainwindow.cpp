@@ -84,7 +84,7 @@ void MainWindow::loadUiText()
     this->ui->saveButton->setText(l10n->getTrans("save"));
 
     QFont font(l10n->getTrans("ui_font"));
-    font.setPointSize(9);
+    font.setPixelSize(12);
     QApplication::setFont(font);
 
     inputWindow->loadUiText();
