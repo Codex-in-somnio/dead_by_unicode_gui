@@ -11,7 +11,7 @@
 #include <map>
 
 #define CONFIG_PATH "dbu_config.json"
-#define VERSION_NUMBER "0.1.4"
+#define VERSION_NUMBER "0.1.5"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
