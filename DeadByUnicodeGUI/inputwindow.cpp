@@ -31,6 +31,13 @@ void InputWindow::loadUiText()
 {
     this->ui->enterButton->setText(l10n->getTrans("enter") + " (Enter)");
     this->ui->hideButton->setText(l10n->getTrans("cancel") + " (Esc)");
+
+    QFont font(l10n->getFontName());
+    font.setPixelSize(12);
+    this->ui->enterButton->setFont(font);
+    this->ui->hideButton->setFont(font);
+    font.setPixelSize(14);
+    this->ui->inputTextArea->setFont(font);
 }
 
 void InputWindow::setFocusToTextArea()
