@@ -13,9 +13,6 @@
   <property name="windowTitle">
    <string>设置</string>
   </property>
-  <property name="locale">
-   <locale language="Chinese" country="China"/>
-  </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QGroupBox" name="hotkeySettingsGroupBox">
     <property name="geometry">

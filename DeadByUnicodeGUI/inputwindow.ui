@@ -24,9 +24,6 @@
 
 color: rgb(255, 255, 255);</string>
   </property>
-  <property name="locale">
-   <locale language="Chinese" country="China"/>
-  </property>
   <widget class="QPlainTextEdit" name="inputTextArea">
    <property name="geometry">
     <rect>
@@ -35,12 +32,6 @@ color: rgb(255, 255, 255);</string>
      <width>261</width>
      <height>71</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>微软雅黑</family>
-     <pointsize>9</pointsize>
-    </font>
    </property>
    <property name="autoFillBackground">
     <bool>false</bool>
