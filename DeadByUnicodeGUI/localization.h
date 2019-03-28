@@ -1,7 +1,9 @@
 #ifndef LOCALIZATION_H
 #define LOCALIZATION_H
-#include <map>
+#include <QJsonObject>
+#include <QJsonDocument>
 #include <QString>
+#include <map>
 
 using namespace std;
 
@@ -12,9 +14,10 @@ public:
     void setCurLangCode(QString langCode);
     map<QString, QString> getLanguages();
     QString getTrans(QString msg, QString langCode = nullptr);
+    QString getFontName();
 
 private:
-    map<QString, map<QString, QString>> m;
+    QJsonObject l10nJsonObj;
     QString curLangCode = "en";
 };
 

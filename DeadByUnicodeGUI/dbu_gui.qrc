@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>resources/dbu_icon_16.png</file>
+        <file>resources/l10n.json</file>
     </qresource>
 </RCC>

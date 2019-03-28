@@ -11,7 +11,7 @@
 #include <map>
 
 #define CONFIG_PATH "dbu_config.json"
-#define VERSION_NUMBER "0.1.5"
+#define VERSION_NUMBER "0.1.6"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -83,7 +83,7 @@ void MainWindow::loadUiText()
     this->ui->displayLanguageLabel->setText(l10n->getTrans("language") + ":");
     this->ui->saveButton->setText(l10n->getTrans("save"));
 
-    QFont font(l10n->getTrans("ui_font"));
+    QFont font(l10n->getFontName());
     font.setPixelSize(12);
     QApplication::setFont(font);
 
