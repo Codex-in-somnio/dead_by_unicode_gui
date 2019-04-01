@@ -1,45 +1,69 @@
 # Dead By Unicode GUI
 
-这是一个用于黎明杀机中文聊天的辅助工具。使用此工具可以在游戏中用热键调出支持中文的输入框然后输入中文，原理是通过发送按键事件模拟键盘按下Alt{+Unicode}来输入每个字符。
+Dead By Unicode is a simple, light-weight tool that allows you to enter any Unicode characters in the Basic Multilingual Plane into Dead By Daylight's chat box, which covers almost all modern languages and commonly used symbols. 
 
-## 使用方法
+Currently available user interface languages:
 
-用法很简单，在游戏运行时确保`DeadByUnicodeGUI.exe`在后台运行即可。在游戏中要输入中文时，先把光标定位到聊天框，然后用设置好的热键（默认是Alt+Shift+D）调出输入框即可输入中文。
+* English
+* Simplified Chinese
+* Japanese (Partially)
 
-如果没有启用十六进制小键盘输入，程序会在启动时询问是否要启用。如果选择启用，程序会将注册表键值`HKEY_CURRENT_USER\Control Panel\Input Method\EnableHexNumpad`的数据设为`1`，然后重新登录Windows后即可生效。不启用无法实现输入。
+Readme in other languages: [中文版Readme](https://github.com/k9yyy/dead_by_unicode_gui/blob/master/README_zh.md)
 
-## 下载发布版
+Original Python project: [Dead By Unicode](https://github.com/k9yyy/dead_by_unicode)
 
-从[Releases](https://github.com/k9yyy/dead_by_unicode_gui/releases)中下载最新版的`DeadByUnicodeGUI_x.x.x.zip`压缩包，其中包含构建好的exe和依赖的dll，解压即可直接使用。
+## How it works
 
-## 从源码构建
+It works by automating hexadecimal numpad input (Holding `Alt` and typing `+xxxx`).
 
-项目开发使用的是Qt Open Source 5.4.2框架和MinGW 4.9.1（32位）工具链。
+Hexadecimal numpad input requires a string type value `EnableHexNumpad` under the registry key `HKEY_CURRENT_USER\Control Panel\Input Method` to be set as `1`.
 
-可以从命令行构建：
+## Usage
+
+To use Dead By Unicode, simply execute `DeadByUnicodeGUI.exe` and make sure it is running in the background while in game. To enter text, locate the cursor at the to the chat box, and press the pre-defined hotkey combination (default is `Alt` + `Shift` + `D`) to bring up the input box provided by this tool that supports normal text input.
+
+By default, the Settings window opens once `DeadByUnicodeGUI.exe` starts. The default hotkey combination can be changed there. 
+
+If `EnableHexNumpad` has not been properly set, the program will prompt whether to set the registry key value automatically. After the registry key value is set, re-login to Windows is required for it to take effect.
+
+### About key event delay
+
+There is a "Key delay" option which specifies how many milliseconds of extra delay to add to each key event to be sent. The shorter extra delay, the faster it can enter text. However, enter too fast with too many characters may cause the keyboard event queue to overflow, and some characters to be lost. ([Check this issue](https://github.com/k9yyy/dead_by_unicode/issues/1))
+
+## Binary releases
+
+Get the newest binary package (named `DeadByUnicodeGUI_x.x.x.zip`) from [Releases](https://github.com/k9yyy/dead_by_unicode_gui/releases). The binary packages contain Dead By Unicode's executable and necessary DLL dependencies. 
+
+## Build from source
+
+Use Qt 5 Open Source framework and MinGW toolchain.
+
+Build from command-line: (make sure these executables are in PATH variable)
 
 ```
 qmake -o Makefile DeadByUnicodeGUI.pro
 mingw32-make
 ```
 
-也可以用QtCreator打开`DeadByUnicodeGUI.pro`构建。
+Or use QtCreator to open `DeadByUnicodeGUI.pro` and build
 
-## 贡献翻译
+## Contribute translations
 
-从v0.1.6开始，可以从外部载入语言文件。
+Since version 0.1.6, it allows external localization files to be loaded into the program, which makes it easy to change the localization strings without having to rebuild.
 
-将项目中的`DeadByUnicodeGUI/resources/l10n.json`放到`DeadByUnicodeGUI.exe`所在的目录，即可自定义。修改完确认可以使用之后，再通过PR推回去即可贡献翻译。
+Copy `DeadByUnicodeGUI/resources/l10n.json` from the project and place it into the directory where `DeadByUnicodeGUI.exe` is located, and it will be used as the localization file instead of the internal one. 
 
-`l10n.json`的格式：
+After editing `l10n.json`, you can send a pull request to push it back. 
+
+Format of `l10n.json`:
 
 ```
 {
-    "<两个字母的ISO语言代码>": {
-    	"language_name": "<语言的显示名称>",
-        "ui_font": "<使用的字体>",
+    "<two-letter ISO language code>": {
+    	"language_name": "<display name of the language>",
+        "ui_font": "<font to be used>",
         "messages": {
-            "<项目>": "<翻译>",
+            "<key>": "<translation>",
             ...
         }
     },
@@ -47,9 +71,8 @@ mingw32-make
 }
 ```
 
-一些事项：
+Some notes:
 
-* 没有翻译的项目会用英文显示；
-* 没有指定字体的话会使用系统默认；
-
-* `l10n.json`在程序启动时载入。
+* Untranslated messages will use their English version as fallback;
+* If `ui_font` is not specified, the system-default font will be used;  
+* `l10n.json` is loaded when the program starts.

@@ -33,7 +33,7 @@
             "release_version": "Release version",
             "build_datetime": "Build timestamp",
             "github_project_page": "GitHub project",
-            "github_project_url": "https: //github.com/k9yyy/dead_by_unicode_gui"
+            "github_project_url": "https://github.com/k9yyy/dead_by_unicode_gui"
         }
     },
     "zh": {
@@ -70,7 +70,7 @@
             "release_version": "Release 版本",
             "build_datetime": "编译时间",
             "github_project_page": "GitHub项目页",
-            "github_project_url": "https: //github.com/k9yyy/dead_by_unicode_gui"
+            "github_project_url": "https://github.com/k9yyy/dead_by_unicode_gui"
         }
     },
     "ja": {
